@@ -49,6 +49,18 @@ impl Universe {
 
 #[wasm_bindgen]
 impl Universe {
+    pub fn width(&self) -> u32 {
+        self.width
+    }
+
+    pub fn height(&self) -> u32 {
+        self.height
+    }
+
+    pub fn cells(&self) -> *const Cell {
+        self.cells.as_ptr()
+    }
+
     pub fn tick(&mut self) {
         let mut next_state = self.cells.clone();
 
@@ -61,7 +73,7 @@ impl Universe {
                 let next_cell = match (cell, live_neighbours) {
                     (Cell::Alive, 0..=1) => Cell::Dead,
                     (Cell::Alive, 2..=3) => Cell::Alive,
-                    (Cell::Alive, 4..=8) => Cell::Alive,
+                    (Cell::Alive, 4..=8) => Cell::Dead,
                     (Cell::Dead, 3) => Cell::Alive,
                     (cell, _) => cell
                 };
@@ -73,12 +85,12 @@ impl Universe {
     }
 
     pub fn new() -> Universe {
-        let width = 64;
-        let height = 64;
+        let width = 128;
+        let height = 128;
         
         let cells = (0..width * height)
-            .map(|x| {
-                if x % 2 == 0 || x % 7 == 0 {
+            .map(|_| {
+                if js_sys::Math::random() < 0.5 {
                     Cell::Alive
                 } else {
                     Cell::Dead
